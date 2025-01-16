@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 /**
@@ -10,8 +9,6 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
  * This contract allows users to create their own ERC20 token with a specified name, symbol, and total supply.
  */
 contract DecentTokenCreatorERC20 is Ownable, ReentrancyGuard {
-    using SafeERC20 for IERC20;
-
     string public name;
     string public symbol;
     uint8 public constant decimals = 18;
@@ -23,19 +20,19 @@ contract DecentTokenCreatorERC20 is Ownable, ReentrancyGuard {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
-    constructor(string memory _name, string memory _symbol, uint256 _totalSupply, address owner)
-        Ownable(msg.sender)
-    {
+    constructor(
+        string memory _name, 
+        string memory _symbol, 
+        uint256 _totalSupply, 
+        address initialOwner
+    ) Ownable(initialOwner) {
         name = _name;
         symbol = _symbol;
         totalSupply = _totalSupply;
 
-        // Initially, assign the total supply to the owner of the contract
-        balances[owner] = totalSupply;
-        emit Transfer(address(0), owner, totalSupply);
-
-        // Transfer ownership of the contract to the given address
-        transferOwnership(owner);
+        // Initially, assign the total supply to the specified owner
+        balances[initialOwner] = totalSupply;
+        emit Transfer(address(0), initialOwner, totalSupply);
     }
 
     function balanceOf(address account) external view returns (uint256) {
@@ -46,7 +43,7 @@ contract DecentTokenCreatorERC20 is Ownable, ReentrancyGuard {
         require(to != address(0), "ERC20: transfer to the zero address");
         require(value <= balances[msg.sender], "ERC20: insufficient balance");
 
-        _safeTransfer(msg.sender, to, value);
+        _transfer(msg.sender, to, value);
         return true;
     }
 
@@ -61,11 +58,8 @@ contract DecentTokenCreatorERC20 is Ownable, ReentrancyGuard {
         require(value <= balances[from], "ERC20: insufficient balance");
         require(value <= allowances[from][msg.sender], "ERC20: insufficient allowance");
 
-        unchecked {
-            allowances[from][msg.sender] -= value;
-        }
-
-        _safeTransfer(from, to, value);
+        allowances[from][msg.sender] -= value;
+        _transfer(from, to, value);
         return true;
     }
 
@@ -86,7 +80,7 @@ contract DecentTokenCreatorERC20 is Ownable, ReentrancyGuard {
         return true;
     }
 
-    function _safeTransfer(address from, address to, uint256 value) internal {
+    function _transfer(address from, address to, uint256 value) internal {
         balances[from] -= value;
         balances[to] += value;
         emit Transfer(from, to, value);
@@ -97,7 +91,6 @@ contract DecentTokenCreatorERC20 is Ownable, ReentrancyGuard {
      * and it will no longer be possible to call functions with the `onlyOwner` modifier.
      */
     function renounceOwnership() public override onlyOwner {
-        require(totalSupply > 0, "DecentTokenCreatorERC20: Contract must have a total supply to renounce ownership");
         super.renounceOwnership();
     }
 }
