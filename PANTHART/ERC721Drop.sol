@@ -1,18 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-/**
- * ERC721 Drop (cloneable via EIP-1167) with:
- * - Single base URI (no trailing slash)
- * - Presale (Merkle whitelist) and public sale
- * - Per-wallet and per-transaction limits
- * - Immutable royalties (ERC2981)
- *
- * Notes:
- * - totalSupply(): returns minted so far (for explorers)
- * - maxSupply: hard cap (public)
- * - Owner is injected by factory (deployer)
- */
 
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
@@ -22,7 +10,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 
-contract ERC721Drop is
+contract PanthartERC721Drop is
     Initializable,
     ERC721Upgradeable,
     ERC2981Upgradeable,
@@ -34,30 +22,30 @@ contract ERC721Drop is
     // ───────────────────────────── Config ─────────────────────────────
 
     struct DropConfig {
-        string name;                 // ERC-721 name
-        string symbol;               // ERC-721 symbol
+        string name;     
+        string symbol; 
         string baseURI;              // ipfs://<CID> (NO trailing slash)
-        uint256 maxSupply;           // cap > 0
-        address payable feeRecipient;// fee sink (platform)
-        uint256 feeAmount;           // exact msg.value required
-        address royaltyRecipient;    // immutable royalties recipient
-        uint96  royaltyBps;          // <= 1000 (10%)
-        address initialOwner;        // injected by factory (deployer)
+        uint256 maxSupply; 
+        address payable feeRecipient;
+        uint256 feeAmount; 
+        address royaltyRecipient; 
+        uint96  royaltyBps; 
+        address initialOwner; 
     }
 
     struct PublicSaleConfig {
-        uint256 startTimestamp;      // must be > now at init
-        uint256 price;               // wei per token
-        uint256 maxPerWallet;        // lifetime cap per wallet
-        uint256 maxPerTx;            // hard cap per tx (<= 20 suggested by UI)
+        uint256 startTimestamp;   
+        uint256 price;       
+        uint256 maxPerWallet; 
+        uint256 maxPerTx; 
     }
 
     struct PresaleConfig {
-        uint256 startTimestamp;      // 0 => disabled
-        uint256 endTimestamp;        // must be < public start
-        uint256 price;               // wei per token
-        uint256 maxSupply;           // <= maxSupply
-        bytes32 merkleRoot;          // keccak(address) leaves
+        uint256 startTimestamp; 
+        uint256 endTimestamp; 
+        uint256 price; 
+        uint256 maxSupply; 
+        bytes32 merkleRoot;
     }
 
     // ─────────────────────────── Storage ─────────────────────────────

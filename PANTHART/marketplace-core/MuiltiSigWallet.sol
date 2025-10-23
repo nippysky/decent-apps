@@ -7,10 +7,7 @@ import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-/// @title MultisigWallet
-/// @notice Multi-signature wallet for native ETN and ERC20, with arbitrary calls.
-///         Supports classic on-chain confirmations and optional EIP-712 off-chain signatures.
-contract MultisigWallet is EIP712, ReentrancyGuard {
+contract PanthartMultiSignatureWallet is EIP712, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     // ---------------------- Owners & Requirement ----------------------
@@ -24,12 +21,12 @@ contract MultisigWallet is EIP712, ReentrancyGuard {
     // --------------------------- Transactions -------------------------
 
     struct Transaction {
-        address tokenAddress;   // address(0) for native ETN
-        address to;             // recipient / target
-        uint256 value;          // native or token amount
-        bool executed;          // whether executed
-        uint256 confirmations;  // on-chain owner confirmations count
-        bytes data;             // optional calldata to pass to `to`
+        address tokenAddress; 
+        address to; 
+        uint256 value; 
+        bool executed; 
+        uint256 confirmations;
+        bytes data; 
     }
 
     mapping(uint256 => mapping(address => bool)) public confirmations;

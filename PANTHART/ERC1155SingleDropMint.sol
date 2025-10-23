@@ -8,10 +8,10 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-/// @title  ERC1155DropSingleToken (Cloneable)
+/// @title  PanthartERC1155SingleDrop (Cloneable)
 /// @notice Cloneable 1-of-1 ERC-1155 drop with configurable supply, price, per-wallet cap,
 ///         immutable royalties, and one-time deployment fee.
-contract ERC1155DropSingleToken is
+contract PanthartERC1155SingleDrop is
     Initializable,
     ERC1155Upgradeable,
     ERC1155URIStorageUpgradeable,
@@ -62,8 +62,8 @@ contract ERC1155DropSingleToken is
         address payable feeRecipient;
         uint256  feeAmount;
         address  royaltyRecipient;
-        uint96   royaltyBps;       // <= 1000 (10%)
-        address  initialOwner;     // injected by factory (deployer)
+        uint96   royaltyBps;   
+        address  initialOwner; 
     }
 
     /// @notice Initialize the clone with its configuration. Call exactly once.

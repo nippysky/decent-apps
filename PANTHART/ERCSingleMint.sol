@@ -7,9 +7,9 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-/// @title  ERC721SingleMint (Cloneable)
+/// @title  PanthartERC721SingleMint (Cloneable)
 /// @notice Cloneable 1-of-1 ERC-721 with immutable royalties and one-time deployment fee.
-contract ERC721SingleMint is
+contract PanthartERC721SingleMint is
     Initializable,
     ERC721URIStorageUpgradeable,
     ERC2981Upgradeable,
@@ -26,14 +26,14 @@ contract ERC721SingleMint is
 
     /// @notice Parameters for initialization
     struct SingleConfig {
-        string  name;               // ERC-721 name (non-empty)
-        string  symbol;             // ERC-721 symbol (non-empty)
-        string  tokenURI;           // Metadata URI for token #1 (non-empty)
-        address payable feeRecipient; // Where to forward the fee (non-zero)
-        uint256 feeAmount;          // Exact wei required on init
-        address royaltyRecipient;   // Immutable royalty recipient (non-zero)
-        uint96  royaltyBps;         // Immutable royalty bps (<=1000 i.e. 10%)
-        address initialOwner;       // Injected by factory (deployer)
+        string  name; 
+        string  symbol; 
+        string  tokenURI; 
+        address payable feeRecipient;
+        uint256 feeAmount;
+        address royaltyRecipient;
+        uint96  royaltyBps;
+        address initialOwner;
     }
 
     /// @notice Initialize the clone. Call once.
@@ -61,7 +61,7 @@ contract ERC721SingleMint is
         // --- Store and forward deployment fee ---
         deploymentFee = cfg.feeAmount;
         (bool sent,) = cfg.feeRecipient.call{value: cfg.feeAmount}("");
-        require(sent, "Fee xfer failed");
+        require(sent, "Fee transfer failed");
 
         // --- Immutable royalties ---
         _setDefaultRoyalty(cfg.royaltyRecipient, cfg.royaltyBps);
@@ -94,7 +94,7 @@ contract ERC721SingleMint is
     //                          Withdraw Residual ETH
     // ----------------------------------------------------------------------------
 
-    /// @notice Withdraw any stray ETH (should normally be zero)
+    /// @notice Withdraw any stray ETN (should normally be zero)
     function withdraw(address payable to) external onlyOwner nonReentrant {
         uint256 bal = address(this).balance;
         require(bal > 0, "No funds");

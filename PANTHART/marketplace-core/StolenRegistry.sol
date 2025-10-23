@@ -4,29 +4,20 @@ pragma solidity ^0.8.27;
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
 
-/**
- * @title IStolenRegistry
- * @notice Minimal view used by marketplace.
- */
 interface IStolenRegistry {
     function isStolen(address tokenContract, uint256 tokenId) external view returns (bool);
 }
 
-/**
- * @title StolenRegistry
- * @notice Global registry of flagged NFTs and collections.
- *         Admin (multisig) governs roles; admin can also flag/clear directly.
- *         Pausable; rich events for indexing; no external dependencies.
- */
-contract StolenRegistry is IStolenRegistry, AccessControl, Pausable {
+
+contract PanthartStolenRegistry is IStolenRegistry, AccessControl, Pausable {
     bytes32 public constant REPORTER_ROLE = keccak256("REPORTER_ROLE");
     bytes32 public constant CLEARER_ROLE  = keccak256("CLEARER_ROLE");
 
     struct Report {
         address reporter;
         uint64  timestamp;
-        bytes32 reasonHash;   // optional: hash of off-chain reason/details
-        string  evidenceURI;  // optional: link to evidence
+        bytes32 reasonHash; 
+        string  evidenceURI; 
         bool    active;
     }
 

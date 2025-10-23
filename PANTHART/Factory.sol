@@ -46,12 +46,12 @@ interface IERC721SingleMint {
         uint256 feeAmount;
         address royaltyRecipient;
         uint96  royaltyBps;
-        address initialOwner; // injected by factory
+        address initialOwner; 
     }
     function initialize(SingleConfig calldata cfg) external payable;
 }
 
-interface IERC1155DropSingleToken {
+interface IERC1155SingleDrop {
     struct Config {
         string   name;
         string   symbol;
@@ -63,12 +63,12 @@ interface IERC1155DropSingleToken {
         uint256  feeAmount;
         address  royaltyRecipient;
         uint96   royaltyBps;
-        address  initialOwner; // injected by factory
+        address  initialOwner;
     }
     function initialize(Config calldata cfg) external payable;
 }
 
-contract NFTFactory is Ownable, ReentrancyGuard {
+contract PanthartNFTFactory is Ownable, ReentrancyGuard {
     using Clones for address;
 
     address public immutable erc721DropImpl;
@@ -139,13 +139,13 @@ contract NFTFactory is Ownable, ReentrancyGuard {
         return clone;
     }
 
-    // -------------------- ERC1155 SINGLE-TOKEN DROP --------------------
+    // -------------------- ERC1155 SINGLE DROP --------------------
     function createERC1155Drop(
-        IERC1155DropSingleToken.Config calldata cfg
+        IERC1155SingleDrop.Config calldata cfg
     ) external payable nonReentrant returns (address) {
         address clone = erc1155DropImpl.clone();
 
-        IERC1155DropSingleToken.Config memory withOwner = IERC1155DropSingleToken.Config({
+        IERC1155SingleDrop.Config memory withOwner = IERC1155SingleDrop.Config({
             name: cfg.name,
             symbol: cfg.symbol,
             baseURI: cfg.baseURI,
@@ -159,7 +159,7 @@ contract NFTFactory is Ownable, ReentrancyGuard {
             initialOwner: msg.sender
         });
 
-        IERC1155DropSingleToken(clone).initialize{value: msg.value}(withOwner);
+        IERC1155SingleDrop(clone).initialize{value: msg.value}(withOwner);
         emit ERC1155DropCloneCreated(msg.sender, clone);
         return clone;
     }

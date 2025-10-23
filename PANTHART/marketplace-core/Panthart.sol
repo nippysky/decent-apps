@@ -19,7 +19,7 @@ interface IStolenRegistry {
     function isStolen(address tokenContract, uint256 tokenId) external view returns (bool);
 }
 
-contract Marketplace is AccessControl, Pausable, ReentrancyGuard, ERC721Holder, ERC1155Holder {
+contract Panthart is AccessControl, Pausable, ReentrancyGuard, ERC721Holder, ERC1155Holder {
     // Roles
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant CONFIG_ROLE = keccak256("CONFIG_ROLE");
@@ -29,9 +29,9 @@ contract Marketplace is AccessControl, Pausable, ReentrancyGuard, ERC721Holder, 
     uint256 public constant MAX_FEE_BPS = 1_000; // 10%
 
     // Config
-    uint256 public feeBps              = 250; // 2.5%
-    uint256 public distributorShareBps = 150; // of the fee (e.g. 1.5% when fee is 2.5%)
-    uint256 public snipeExtension      = 300; // seconds
+    uint256 public feeBps              = 250;
+    uint256 public distributorShareBps = 150;
+    uint256 public snipeExtension      = 300;
 
     address public feeRecipient;
     address public rewardsDistributor;
@@ -47,12 +47,12 @@ contract Marketplace is AccessControl, Pausable, ReentrancyGuard, ERC721Holder, 
         address seller;
         address token;
         uint256 tokenId;
-        uint256 quantity;         // 1 for ERC721
+        uint256 quantity;    
         TokenStandard standard;
-        address currency;         // address(0)=ETN else ERC20
+        address currency;   
         uint256 price;
         uint64  startTime;
-        uint64  endTime;          // 0 = no expiry
+        uint64  endTime; 
         bool    active;
     }
 
@@ -69,9 +69,9 @@ contract Marketplace is AccessControl, Pausable, ReentrancyGuard, ERC721Holder, 
         address seller;
         address token;
         uint256 tokenId;
-        uint256 quantity;         // 1 for ERC721
+        uint256 quantity;   
         TokenStandard standard;
-        address currency;         // address(0)=ETN else ERC20
+        address currency;  
         uint256 startPrice;
         uint256 minIncrement;
         uint64  startTime;
@@ -193,7 +193,7 @@ contract Marketplace is AccessControl, Pausable, ReentrancyGuard, ERC721Holder, 
         rewardsDistributor = _rewardsDistributor;
         stolenRegistry     = IStolenRegistry(_stolenRegistry);
 
-        currencyAllowed[address(0)] = true; // native ETN on
+        currencyAllowed[address(0)] = true;
         emit CurrencySet(address(0), true);
 
         emit ConfigUpdated(

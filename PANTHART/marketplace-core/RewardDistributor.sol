@@ -16,7 +16,7 @@ import {SafeERC20}       from "@openzeppelin/contracts/token/ERC20/utils/SafeERC
  *         - Signer authorizes cumulative claim caps per (account, token).
  *         - Users claim up to their signed total; contract tracks amounts paid.
  */
-contract RewardsDistributor is AccessControl, Pausable, ReentrancyGuard, EIP712 {
+contract PanthartRewardDistributor is AccessControl, Pausable, ReentrancyGuard, EIP712 {
     using SafeERC20 for IERC20;
 
     bytes32 public constant FUNDER_ROLE = keccak256("FUNDER_ROLE");

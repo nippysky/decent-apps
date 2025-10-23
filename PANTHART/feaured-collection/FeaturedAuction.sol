@@ -1,35 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-/*
- * FeaturedAuction.sol
- *
- * One contract for both TEST and PROD:
- * - DEFAULT_DURATION (seconds) set at deploy (e.g., 30 min for test, ~28 days for prod).
- * - START_DELAY (seconds) to give UI time before a cycle starts.
- * - startNextCycleNow() or startNextCycle() use DEFAULT_DURATION automatically.
- *
- * Bidding:
- *  - First bid sets your collection address for the cycle; must >= minBidWei and beat leader (if any).
- *  - increaseBid() lets you top-up; if not leader you must strictly beat leader’s total.
- *
- * Settlement:
- *  - finalizeCycle(cycleId, refundBatch) locks the winner; optionally processes some loser refunds.
- *  - batchRefund(cycleId, maxRefunds) continues refunds safely.
- *  - withdrawTreasury(cycleId) pays winner’s total to the treasury once.
- *  - claimRefund(cycleId) lets an individual loser pull their refund after finalize.
- *
- * Security:
- *  - Ownable2Step admin, operator role for automation, Pausable, ReentrancyGuard.
- *  - No generic owner withdraw. Funds only flow as refunds or treasury payout.
- */
 
 import "@openzeppelin/contracts/access/Ownable2Step.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract FeaturedAuction is Ownable2Step, Pausable, ReentrancyGuard {
+contract PanthartFeaturedCollectionAuction is Ownable2Step, Pausable, ReentrancyGuard {
     /*//////////////////////////////////////////////////////////////
                                 EVENTS
     //////////////////////////////////////////////////////////////*/
@@ -66,10 +44,10 @@ contract FeaturedAuction is Ownable2Step, Pausable, ReentrancyGuard {
                               STRUCTS
     //////////////////////////////////////////////////////////////*/
     struct Bid {
-        uint256 total;        // running total in WEI
-        address collection;   // immutable per cycle (first bid sets it)
+        uint256 total; 
+        address collection;
         bool exists;
-        bool refunded;        // set true after refund sent
+        bool refunded;
     }
 
     struct Cycle {
@@ -77,10 +55,10 @@ contract FeaturedAuction is Ownable2Step, Pausable, ReentrancyGuard {
         uint256 endAt;
         uint256 minBidWei;
 
-        address leader;       // highest total bidder
-        uint256 leaderAmount; // highest total in WEI
+        address leader;
+        uint256 leaderAmount;
 
-        address winner;             // set at finalize
+        address winner;    
         address winnerCollection;
         uint256 winnerAmount;
 
@@ -88,21 +66,21 @@ contract FeaturedAuction is Ownable2Step, Pausable, ReentrancyGuard {
         bool payoutDone;
         bool exists;
 
-        address[] bidders;    // registry for refunds
-        uint256 refundCursor; // batched refund cursor
+        address[] bidders; 
+        uint256 refundCursor; 
     }
 
     /*//////////////////////////////////////////////////////////////
                            STORAGE & MODIFIERS
     //////////////////////////////////////////////////////////////*/
-    address public operator;                 // hot wallet for automation
-    address public treasury;                 // Panthart funds receiver
+    address public operator; 
+    address public treasury; 
 
     uint256 public immutable DEFAULT_DURATION;
     uint256 public immutable START_DELAY;
 
     mapping(bytes32 => Cycle) private _cycles;
-    mapping(bytes32 => mapping(address => Bid)) private _bids; // cycleId => bidder => Bid
+    mapping(bytes32 => mapping(address => Bid)) private _bids;
     mapping(bytes32 => mapping(address => bool)) private _isBidder;
 
     modifier onlyOperatorOrOwner() {
@@ -119,7 +97,7 @@ contract FeaturedAuction is Ownable2Step, Pausable, ReentrancyGuard {
         uint256 _defaultDurationSeconds,
         uint256 _startDelaySeconds
     )
-        Ownable(msg.sender) // OZ v5: pass initial owner
+        Ownable(msg.sender)
     {
         if (_treasury == address(0)) revert ZeroAddress();
         if (_defaultDurationSeconds == 0) revert BadParams();
@@ -235,7 +213,7 @@ contract FeaturedAuction is Ownable2Step, Pausable, ReentrancyGuard {
         Cycle storage c = _requireExistingCycle(cycleId);
         if (!c.finalized) revert CycleNotActive();
 
-        if (msg.sender == c.winner) revert BadParams(); // winner has no refund
+        if (msg.sender == c.winner) revert BadParams();
 
         Bid storage b = _bids[cycleId][msg.sender];
         if (!b.exists) revert NoExistingBid();
